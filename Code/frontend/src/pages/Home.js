@@ -11,7 +11,6 @@ import AppHeader from '../components/Header';
 import NeumorphicPagination from '../components/NeumorphicPagination';
 import StyledTabs from '../components/StyledTabs.tsx';
 import UserContext from '../contexts/UserContext';
-import { bannerData } from '../data/mockData';
 import {
   dissolveCourse,
   getAllCourses,
@@ -25,6 +24,23 @@ import '../css/global.css';
 const { Content } = Layout;
 
 const PAGE_SIZE = 12;
+const bannerData = [
+  {
+    img: 'https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAImVWhc8Su4goN4MuMgnBVE38EwyYa-AAKkFgACvxDoVrSO_4TzL6PNNgQ.jpg',
+    title: '欢迎来到课程智能助手',
+    desc: '智能学习，轻松掌握每一门课程',
+  },
+  {
+    img: 'https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAIr42hl6BF0JVXjOL-LHYMGmQ6Q5ENuAAKrGAACPnsxV1FPhaeIkU1_NgQ.jpg',
+    title: '优质课程推荐',
+    desc: '发现更多优质课程，提升自我',
+  },
+  {
+    img: 'https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAIr5Ghl6BK3LFz4QREYh9WqwauCbnptAAKsGAACPnsxV25CLs0-gab8NgQ.jpg',
+    title: '课程学习与交流',
+    desc: '在资料、习题和社区中持续推进学习',
+  }
+];
 
 const Home = () => {
   const [searchText, setSearchText] = useState('');

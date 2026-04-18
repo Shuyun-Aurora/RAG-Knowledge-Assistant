@@ -1,8 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Card, Typography, Button, InputNumber, Select } from 'antd';
+import { Card, Typography, InputNumber, Select } from 'antd';
 import QAChat from '../components/QAChat';
 import MaterialPreview from '../components/MaterialPreview';
-import { qaHistory } from '../data/mockData';
 import UserContext from '../contexts/UserContext';
 import CourseContext from "../contexts/CourseContext";
 import { getDocumentsByCourse } from '../service/file';
@@ -11,9 +10,9 @@ import { useSearchParams } from 'react-router-dom';
 const { Text } = Typography;
 
 const CourseQAPage = () => {
-  const { courseId, course } = useContext(CourseContext);
+  const { course } = useContext(CourseContext);
   const user = useContext(UserContext);
-  const fullQaHistory = qaHistory[courseId] || [];
+  const fullQaHistory = [];
   const userQaHistory = [];
   const [searchParams] = useSearchParams();
   const urlSessionId = searchParams.get('session_id');
