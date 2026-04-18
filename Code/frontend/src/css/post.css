@@ -1,0 +1,24 @@
+/* 评论高亮动画 */
+.highlighted-comment {
+    animation: highlight-flash 1.5s ease-in-out;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+  }
+  
+  @keyframes highlight-flash {
+    0% {
+      background-color: transparent;
+    }
+    20% {
+      background-color: rgba(246,242,225,0.6);
+    }
+    100% {
+      background-color: transparent;
+    }
+  }
+  
+  /* 确保评论项有足够的内边距来显示高亮效果 */
+  .ant-list-item {
+    border-radius: 8px;
+    transition: background-color 0.8s;
+  } 

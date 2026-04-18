@@ -1,0 +1,27 @@
+/* 全局字体和基础样式 */
+
+body {
+  background: #F8F5FF;
+  font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 
+    'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: 0.2px;
+}
+
+/* 标题字体样式 */
+h1, h2, h3, h4, h5, h6, .ant-typography {
+  font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', sans-serif;
+  letter-spacing: -0.2px;
+  font-weight: 600;
+}
+
+/* 正文字体样式 */
+p, span, div, button, input, textarea {
+  font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+}
+

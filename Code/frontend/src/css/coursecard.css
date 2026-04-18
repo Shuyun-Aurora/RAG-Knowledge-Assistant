@@ -1,0 +1,140 @@
+.course-card {
+    position: relative;
+    background: var(--bg-color);
+    border-radius: 20px;
+    box-shadow: 8px 8px 15px var(--shadow-dark), -8px -8px 15px var(--shadow-light);
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0;
+    margin-bottom: 24px;
+    overflow: hidden;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .course-card:hover {
+    transform: translateY(-4px) scale(1.03);
+    box-shadow: 0 12px 32px rgba(151, 138, 153, 0.18), 0 2px 8px rgba(0,0,0,0.08);
+  }
+  
+  .course-card-overlay {
+  position: relative;
+  margin: 16px;
+  border-radius: 16px;
+  padding: 20px 20px 16px 20px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+  
+  .course-card .card-btn-group {
+    margin: 0 20px 18px 0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    z-index: 2;
+    position: relative;
+  }
+
+/* 统一信息区字体样式 */
+.course-card .course-info-text {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  color: #2e5266;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.2px;
+}
+
+.coursecard-btn {
+  /* 背景色由外部style传入，保证和卡片底色一致 */
+  color: #2e5266 !important;
+  border: none;
+  border-radius: 14px;
+  box-shadow: -4px -4px 12px #d8eaf4, 4px 4px 12px #699dba;
+  font-weight: 600;
+  font-size: 15px;
+  height: 34px;
+  padding: 0 18px;
+  transition: box-shadow 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+  cursor: pointer;
+  margin-left: 6px;
+}
+.coursecard-btn * {
+  color: #2e5266 !important;
+}
+.coursecard-btn:hover {
+  /* 悬浮时无任何变化 */
+  color: #2e5266 !important;
+  box-shadow: -4px -4px 12px #eaf6fd, 4px 4px 12px #7bb1d1;
+}
+.coursecard-btn:active {
+  box-shadow: inset 2px 2px 5px #7bb1d1, inset -2px -2px 5px #eaf6fd !important;
+  color: #2e5266 !important;
+}
+
+.coursecard-btn-dissolve {
+  min-width: 100px;
+  height: 40px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 14px;
+  background: inherit;
+  color: #000000 !important;
+  box-shadow: -4px -4px 12px #eaf6fd, 4px 4px 12px #7bb1d1;
+  transition: box-shadow 0.2s;
+  margin-left: 8px;
+}
+.coursecard-btn-dissolve * {
+  color: #000000 !important;
+}
+.coursecard-btn-dissolve:hover {
+  /* 悬浮时无任何变化 */
+  color: #000000 !important;
+  box-shadow: -4px -4px 12px #eaf6fd, 4px 4px 12px #7bb1d1;
+}
+.coursecard-btn-dissolve:active {
+  box-shadow: inset 2px 2px 5px #7bb1d1, inset -2px -2px 5px #eaf6fd !important;
+  color: #000000 !important;
+}
+.material-card {
+  min-height: unset !important;
+}
+
+/* 危险操作按钮样式 - 红色文字 */
+.coursecard-btn-danger {
+ min-width: 100px;
+ height: 40px;
+ font-size: 16px;
+ font-weight: 600;
+ border-radius: 14px;
+ background: inherit;
+ color: #ff7875 !important;
+ box-shadow: -4px -4px 12px #eaf6fd, 4px 4px 12px  #7bb1d1;
+ transition: box-shadow 0.2s;
+ margin-left: 8px;
+}
+
+.coursecard-btn-danger * {
+ color: #ff7875 !important;
+}
+
+.coursecard-btn-danger:hover {
+ /* 悬浮时无任何变化 */
+ color: #ff7875 !important;
+ box-shadow: -4px -4px 12px #eaf6fd, 4px 4px 12px #7bb1d1;
+}
+
+.coursecard-btn-danger:active {
+ box-shadow: inset 2px 2px 5px #7bb1d1, inset -2px -2px 5px #eaf6fd !important;
+ color: #ff7875 !important;
+}

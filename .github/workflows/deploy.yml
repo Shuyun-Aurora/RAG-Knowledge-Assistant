@@ -1,0 +1,51 @@
+name: 🚀 Auto Deploy Backend
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ 拉取仓库代码
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ 配置 SSH
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_id_ed25519
+          chmod 600 ~/.ssh/deploy_id_ed25519
+          # 配置 SSH host 简化后续命令
+          cat >> ~/.ssh/config <<EOF
+          Host deploy-server
+            HostName ${{ secrets.SSH_HOST }}
+            User ${{ secrets.SSH_USER }}
+            IdentityFile ~/.ssh/deploy_id_ed25519
+            StrictHostKeyChecking no
+          EOF
+
+      # 3️⃣ 连接服务器并部署
+      - name: Deploy to server
+        run: |
+          ssh -t deploy-server << 'EOF'
+            set -e
+            echo "📦 切换到项目目录"
+            cd /root/RAG-Knowledge-Assistant
+
+            echo "📥 拉取最新代码"
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "💥 执行 start_backend.sh"
+            bash Code/backend/start_backend.sh
+
+            echo "💥 执行 start_frontend.sh"
+            bash Code/frontend/start_frontend.sh
+
+            echo "✅ 部署完成"
+          EOF

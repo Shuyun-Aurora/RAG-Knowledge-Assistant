@@ -1,0 +1,130 @@
+
+.qa-container {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 200px);
+  background-color: #f5f5f5;
+  margin: -24px;
+  padding: 0;
+}
+
+.qa-message-list {
+  flex: 1;
+  padding: 24px;
+  background-color: #fafafa;
+  display: flex;
+  flex-direction: column;
+}
+
+.qa-message {
+  display: flex;
+  margin-bottom: 20px;
+  align-items: flex-start;
+}
+
+.qa-message-ai {
+  justify-content: flex-start;
+}
+
+.qa-message-user {
+  justify-content: flex-end;
+}
+
+.qa-message-content {
+  max-width: 80%;
+  padding: 16px 20px;
+  border-radius: 16px;
+  line-height: 1.5;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.qa-message-content .markdown-content p {
+  margin: 0 0 6px 0;
+  line-height: 1.5;
+}
+
+/* 参考来源也用 markdown-content class，保证行距一致 */
+.markdown-content p,
+.markdown-content > p,
+.markdown-content ul,
+.markdown-content ol,
+.markdown-content li,
+.markdown-content blockquote,
+.markdown-content table,
+.markdown-content pre,
+.markdown-content div {
+  margin-top: 0 !important;
+  margin-bottom: 6px !important;
+  line-height: 1.5 !important;
+  padding: 0 !important;
+}
+.markdown-content li {
+  list-style-position: inside !important;
+}
+
+.qa-message-ai .qa-message-content {
+  background: #fff;
+  color: #333;
+  border: 1px solid #e8e8e8;
+}
+
+.qa-message-user .qa-message-content {
+  background: linear-gradient(135deg, #448dd0 0%, #548dc0 100%);
+  color: white;
+  border: none;
+}
+
+.qa-input-area {
+  padding: 20px 24px;
+  border-top: 1px solid #e8e8e8;
+  background-color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+}
+
+/* 消息内容中的代码块样式 */
+.qa-message-content .markdown-content pre {
+  background-color: #f6f8fa;
+  border: 1px solid #e1e4e8;
+  border-radius: 6px;
+  padding: 16px;
+  overflow-x: auto;
+  margin: 12px 0;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.qa-message-content .markdown-content code {
+  background-color: #f6f8fa;
+  border-radius: 3px;
+  padding: 2px 4px;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 13px;
+}
+
+.qa-message-content .markdown-content pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+/* 空状态样式 */
+.qa-empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #8c8c8c;
+  font-size: 16px;
+}
+
+.qa-empty-state .anticon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  display: block;
+  color: #d9d9d9;
+}
+
+.highlighted-comment {
+  background-color: rgba(255, 223, 130, 0.15);
+  transition: background-color 1s ease;
+}

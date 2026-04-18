@@ -1,0 +1,104 @@
+/* ========== Neumorphism Modal 样式统一 ========== */
+.neumorphic-modal .ant-modal-content {
+    background: var(--bg-color) !important;
+    border-radius: 20px !important;
+    box-shadow: 4px 4px 10px var(--shadow-dark),
+                -4px -4px 10px var(--shadow-light) !important;
+    border: none !important;
+    padding: 24px;
+    transition: all 0.3s ease-in-out;
+  }
+  .neumorphic-modal .ant-modal-header {
+    background: transparent !important;
+    border-bottom: none !important;
+    padding-bottom: 12px !important;
+  }
+  
+  .neumorphic-modal .ant-modal-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-dark);
+  }
+  
+  .neumorphic-modal .ant-modal-footer {
+    background: transparent !important;
+    border-top: none !important;
+    text-align: right;
+    padding-top: 12px;
+  }
+  
+  /* Neumorphic 按钮 */
+  .neumorphic-modal .ant-btn-primary,
+  .neumorphic-modal .ant-btn-default {
+    background: var(--bg-color) !important;
+    color: var(--primary-color) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    box-shadow: 4px 4px 8px var(--shadow-dark),
+                -4px -4px 8px var(--shadow-light) !important;
+    font-weight: 500;
+    font-size: 16px;
+    height: 40px;
+    padding: 0 18px;
+    transition: box-shadow 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .neumorphic-modal .ant-btn-primary:active,
+  .neumorphic-modal .ant-btn-default:active {
+    box-shadow: inset 2px 2px 5px var(--shadow-dark),
+                inset -2px -2px 5px var(--shadow-light) !important;
+  }
+  
+  /* Neumorphic 输入框 */
+  .neumorphic-modal .ant-input,
+  .neumorphic-modal .ant-input-affix-wrapper {
+    background: var(--bg-color) !important;
+    border-radius: 12px !important;
+    box-shadow: inset 4px 4px 8px var(--shadow-dark),
+                inset -4px -4px 8px var(--shadow-light) !important;
+    border: none !important;
+    padding: 10px 16px !important;
+    font-size: 16px;
+    color: var(--text-dark) !important;
+    transition: all 0.3s ease;
+    height: 40px;
+  }
+  
+  /* 密码框只保留底部输入框（隐藏重复 input） */
+  .neumorphic-modal .ant-input-affix-wrapper > input.ant-input {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    font-size: 16px !important;
+    color: var(--text-dark) !important;
+    flex: 1;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .neumorphic-modal .ant-input:focus,
+  .neumorphic-modal .ant-input-affix-wrapper:focus-within {
+    box-shadow: inset 2px 2px 6px var(--shadow-dark),
+                inset -2px -2px 6px var(--shadow-light) !important;
+  }
+  
+  /* Form 表单间距 */
+  .neumorphic-modal .ant-form-item {
+    margin-bottom: 16px;
+  }
+  
+  /* Label 样式 */
+  .neumorphic-modal .ant-form-item-label > label {
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  
+  /* Input placeholder 样式优化 */
+  .neumorphic-modal .ant-input::placeholder {
+    color: #bbb;
+    font-weight: 400;
+  }

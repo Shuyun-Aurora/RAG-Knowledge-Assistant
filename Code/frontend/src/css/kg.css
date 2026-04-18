@@ -1,0 +1,16 @@
+.animated-node {
+    opacity: 0;
+    transform: translateX(-60px);
+    animation: fadeInRight 0.6s forwards;
+    }
+    .animated-node.depth-1 { animation-delay: 0.12s; }
+    .animated-node.depth-2 { animation-delay: 0.24s; }
+    .animated-node.depth-3 { animation-delay: 0.36s; }
+    /* 依次类推，可用更通用的写法 */
+
+    @keyframes fadeInRight {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    }
