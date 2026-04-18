@@ -1,5 +1,5 @@
 from openai import OpenAI
-from langchain.embeddings.base import Embeddings
+from langchain_core.embeddings import Embeddings
 
 
 class QwenEmbeddings(Embeddings):

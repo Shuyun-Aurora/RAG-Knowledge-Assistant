@@ -112,7 +112,7 @@ const UploadMaterial = ({ materials = [], onUpload }) => {
                 <Text type="danger">注意：</Text>
                 <ul style={{ paddingLeft: 20 }}>
                     <li>不支持 ZIP 中嵌套文件夹，请仅上传文件或单层文件夹</li>
-                    <li>单个文件或文件总大小不能超过 {MAX_FILE_SIZE/1024}KB</li>
+                    <li>单个文件或文件总大小不能超过 {MAX_FILE_SIZE/1024/1024}MB</li>
                 </ul>
             </Typography.Paragraph>
 

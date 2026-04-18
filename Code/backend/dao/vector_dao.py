@@ -1,4 +1,4 @@
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from repository.vector_repository import VectorRepository
 from typing import List, Dict, Tuple
 

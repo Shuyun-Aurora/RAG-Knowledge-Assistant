@@ -3,7 +3,7 @@
 import asyncio
 from dao.document_dao import DocumentDAO
 from typing import AsyncGenerator, List, Dict, Any
-from langchain.schema import messages_from_dict, messages_to_dict, HumanMessage, AIMessage
+from langchain_core.messages import messages_from_dict, messages_to_dict, HumanMessage, AIMessage
 from langchain_community.chat_message_histories import ChatMessageHistory
 import json
 from pathlib import Path
@@ -94,6 +94,67 @@ class RAGService:
 
         self._executor.submit(task)
 
+    def submit_multimodal_processing(
+        self,
+        file_content: bytes,
+        filename: str,
+        course_name: str,
+        parse_method: str,
+        file_id: str,
+        generate_knowledge_graph: bool,
+    ):
+        def task():
+            try:
+                success = self.process_one_file_async(
+                    file_content,
+                    filename,
+                    course_name,
+                    parse_method,
+                    file_id,
+                    generate_knowledge_graph,
+                )
+                if success:
+                    print(f"[background task] processed multimodal file successfully: {filename}")
+                else:
+                    print(f"[background task] failed to process multimodal file: {filename}")
+            except SystemExit as e:
+                if e.code == 0:
+                    print(f"[background task] MinerU exited normally: {filename}")
+                else:
+                    print(f"[background task] MinerU exited abnormally ({e.code}): {filename}")
+            except Exception as e:
+                print(f"[background task] failed multimodal file {filename}: {e}")
+
+        self._executor.submit(task)
+
+    async def upload_document_multimodal_batch(
+        self,
+        files: List[dict],
+        course_name: str,
+        parse_method: str = "auto",
+        generate_knowledge_graph: bool = True,
+    ) -> List[str]:
+        file_ids = []
+
+        for f in files:
+            try:
+                file_id = self.document_dao.save_file_to_mongo(
+                    f["file_content"], f["filename"], course_name
+                )
+                file_ids.append(file_id)
+                self.submit_multimodal_processing(
+                    f["file_content"],
+                    f["filename"],
+                    course_name,
+                    parse_method,
+                    file_id,
+                    generate_knowledge_graph,
+                )
+            except Exception as e:
+                print(f"[error] batch upload failed for {f['filename']}: {e}")
+
+        return file_ids
+
     def process_one_file_async(self, file_content: bytes, filename: str, course_name: str,
                                parse_method: str, file_id: str, generate_knowledge_graph: bool):
         """
@@ -134,9 +195,11 @@ class RAGService:
                 ))
 
             print(f"✅ 文件处理完成: {filename}")
+            return True
 
         except Exception as e:
             print(f"❌ 文件解析失败: {filename}，错误: {e}")
+            return False
 
     def get_documents_by_course(self, course_name: str, page: int, size: int):
         return self.document_dao.get_documents_by_course(course_name, page, size)
@@ -722,8 +785,8 @@ class RAGService:
             }
             
             if self.knowledge_graph_service:
-                # 使用知识图谱服务添加节点
-                self.knowledge_graph_service.add_node(node)
+                # 统一走按 entity_id 幂等创建的路径，避免和 LightRAG 的 :base 节点体系产生重复 CourseRoot
+                self.knowledge_graph_service.ensure_course_root(course_name)
                 print(f"已为课程 {course_name} 自动生成知识图谱根节点")
             else:
                 print(f"知识图谱服务未初始化，无法创建CourseRoot节点")

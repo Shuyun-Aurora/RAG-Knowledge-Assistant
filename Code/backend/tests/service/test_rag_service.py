@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock, AsyncMock, patch
 import service.rag_service as rag_service
-from langchain.schema import AIMessage, HumanMessage, messages_to_dict
+from langchain_core.messages import AIMessage, HumanMessage, messages_to_dict
 import asyncio
 
 @pytest.fixture

@@ -569,3 +569,9 @@ class KnowledgeGraphService:
         调用 DAO 层插入知识图谱节点
         """
         return self.knowledge_graph_dao.add_node(node)
+
+    def ensure_course_root(self, course_name: str) -> Dict:
+        return self.knowledge_graph_dao.ensure_course_root(course_name)
+
+    def ensure_course_root_and_link_file_root(self, course_name: str, filename: str) -> Dict:
+        return self.knowledge_graph_dao.ensure_course_root_and_link_file_root(course_name, filename)

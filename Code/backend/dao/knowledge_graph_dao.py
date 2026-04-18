@@ -121,14 +121,28 @@ class KnowledgeGraphDAO:
         """
         labels = ":".join(node.get("labels", ["CourseRoot"]))
         properties = node.get("properties", {})
-        # 构造 Cypher 属性字符串
-        props_str = ", ".join([f"{k}: ${k}" for k in properties.keys()])
-        cypher = f"CREATE (n:{labels} {{{props_str}}})"
-        with self.repository.driver.session() as session:
+        entity_id = properties.get("entity_id")
+        if not entity_id:
+            raise ValueError("KnowledgeGraphDAO.add_node requires properties['entity_id']")
+
+        # 统一基于 entity_id 做幂等写入，并补上 base 标签，避免和 LightRAG 的 upsert_node 生成重复节点
+        cypher = f"""
+        MERGE (n:base {{entity_id: $entity_id}})
+        SET n += $properties
+        SET n:{labels}
+        """
+        with self.repository.driver.session(database=self.repository.target_database) as session:
             session.run(
                 cypher,
-                **properties
+                entity_id=entity_id,
+                properties=properties
             )
 
     def delete_nodes_by_filename(self, filename: str, course_name: str):
         return self.repository.delete_nodes_by_filename(filename, course_name)
+
+    def ensure_course_root(self, course_name: str):
+        return self.repository.ensure_course_root(course_name)
+
+    def ensure_course_root_and_link_file_root(self, course_name: str, filename: str):
+        return self.repository.ensure_course_root_and_link_file_root(course_name, filename)

@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
 
 class Settings(BaseSettings):
@@ -15,7 +15,9 @@ class Settings(BaseSettings):
 
     # JWT Configuration
     SECRET_KEY: str = "qA3v7x_zkDp9mR2gLbN8sWtYwF1jH5uKXeP0oIyV6lZnCf4"
+    JWT_SECRET_KEY: str = "qA3v7x_zkDp9mR2gLbN8sWtYwF1jH5uKXeP0oIyV6lZnCf4"
     ALGORITHM: str = "HS256"
+    JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
     # RAG System Configuration
@@ -34,8 +36,13 @@ class Settings(BaseSettings):
     MONGODB_URI: str = "mongodb://localhost:27017"
     MONGODB_DB: str = "chat_history"
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    # CORS Configuration
+    CORS_ALLOWED_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
 settings = Settings() 

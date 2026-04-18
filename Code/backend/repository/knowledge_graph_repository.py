@@ -49,6 +49,78 @@ class KnowledgeGraphRepository:
             logger.error(f"Error closing Neo4j connection: {str(e)}")
             raise
 
+    def ensure_course_root(self, course_name: str) -> Dict[str, Any]:
+        try:
+            with self.driver.session(database=self.target_database) as session:
+                result = session.run(
+                    """
+                    MERGE (root:base:CourseRoot {entity_id: $course_root_id})
+                    ON CREATE SET
+                        root.entity_type = 'CourseRoot',
+                        root.course = $course_name,
+                        root.name = $course_name,
+                        root.description = $course_description,
+                        root.category = 'CourseRoot',
+                        root.content = $course_content
+                    RETURN root.entity_id AS entity_id, root.course AS course
+                    """,
+                    course_root_id=f"{course_name}_root",
+                    course_name=course_name,
+                    course_description=f"课程{course_name}的根节点",
+                    course_content=f"课程{course_name}的根节点",
+                )
+                record = result.single()
+                return {
+                    "success": True,
+                    "entity_id": record["entity_id"] if record else f"{course_name}_root",
+                    "course": record["course"] if record else course_name,
+                }
+        except Exception as e:
+            logger.error(f"确保 CourseRoot 失败: {str(e)}")
+            return {"success": False, "message": str(e)}
+
+    def ensure_course_root_and_link_file_root(self, course_name: str, filename: str) -> Dict[str, Any]:
+        try:
+            with self.driver.session(database=self.target_database) as session:
+                result = session.run(
+                    """
+                    MERGE (root:base:CourseRoot {entity_id: $course_root_id})
+                    ON CREATE SET
+                        root.entity_type = 'CourseRoot',
+                        root.course = $course_name,
+                        root.name = $course_name,
+                        root.description = $course_description,
+                        root.category = 'CourseRoot',
+                        root.content = $course_content
+                    WITH root
+                    MATCH (file:FileRoot {course: $course_name, name: $filename})
+                    MERGE (root)-[r:CONTAINS]->(file)
+                    SET r.description = '课程根节点包含文件知识图谱根节点',
+                        r.strength = 'Strong',
+                        r.direction = 'CONTAINS'
+                    RETURN root.entity_id AS course_root_id, file.entity_id AS file_root_id
+                    """,
+                    course_root_id=f"{course_name}_root",
+                    course_name=course_name,
+                    filename=filename,
+                    course_description=f"课程{course_name}的根节点",
+                    course_content=f"课程{course_name}的根节点",
+                )
+                record = result.single()
+                if not record:
+                    return {
+                        "success": False,
+                        "message": f"未找到课程 '{course_name}' 下文件 '{filename}' 的 FileRoot 节点",
+                    }
+                return {
+                    "success": True,
+                    "course_root_id": record["course_root_id"],
+                    "file_root_id": record["file_root_id"],
+                }
+        except Exception as e:
+            logger.error(f"确保 CourseRoot 并连接 FileRoot 失败: {str(e)}")
+            return {"success": False, "message": str(e)}
+
     def delete_nodes_by_filename(self, filename: str, course_name: str) -> Dict[str, Any]:
         """
         根据文件名删除知识图谱中的相关节点及其所有子节点

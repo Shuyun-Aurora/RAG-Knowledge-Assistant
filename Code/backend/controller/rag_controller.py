@@ -2,7 +2,6 @@ from urllib.parse import quote
 
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request, Query, Depends
 from fastapi.responses import StreamingResponse
-from task.document_tasks import process_one_file_task
 from service.rag_service import RAGService
 from dto.schemas import QueryRequest, DeleteDocumentResponse, DocumentListResponse, \
     StatisticsResponse, ChatHistorySummaryResponse, AgentStylesResponse
@@ -145,8 +144,15 @@ async def add_document_multimodal_batch(
         content = await file.read()
         file_id = rag_service.document_dao.save_file_to_mongo(content, file.filename, course_name)
         file_ids.append(file_id)
-        # 调用 celery 异步任务
-        process_one_file_task.delay(content, file.filename, course_name, parse_method, file_id, generate_knowledge_graph)
+        # 提交到线程池后台处理
+        rag_service.submit_multimodal_processing(
+            content,
+            file.filename,
+            course_name,
+            parse_method,
+            file_id,
+            generate_knowledge_graph,
+        )
 
     return {
         "message": "Batch upload successful. Files are being processed in background.",

@@ -1,9 +1,15 @@
-from sqlalchemy import create_engine
+from sqlalchemy import URL, create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base, Session
 from .settings import settings
 
-# SQLALCHEMY_DATABASE_URL = f"mysql+pymysql://{settings.MYSQL_USER}:{settings.MYSQL_PASSWORD}@{settings.MYSQL_HOST}:{settings.MYSQL_PORT}/{settings.MYSQL_DB}"
-SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:123456@localhost:3306/rag_db"
+SQLALCHEMY_DATABASE_URL = URL.create(
+    drivername="mysql+pymysql",
+    username=settings.MYSQL_USER,
+    password=settings.MYSQL_PASSWORD,
+    host=settings.MYSQL_HOST,
+    port=settings.MYSQL_PORT,
+    database=settings.MYSQL_DB,
+)
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

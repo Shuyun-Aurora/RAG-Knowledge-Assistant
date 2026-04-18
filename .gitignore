@@ -13,6 +13,7 @@ Code/backend/output/
 # 前端专用忽略项（Code/frontend/ 下）
 # =============================
 Code/frontend/node_modules/
+Code/frontend/build/
 Code/frontend/.env
 Code/frontend/.env.local
 Code/frontend/.env.development.local

@@ -57,8 +57,6 @@ def get_taught_courses(
         return BaseResponse(success=False, message="Only teachers can view their taught courses")
 
     courses, total = fetch_teached_courses(db, current_user.id, page, page_size, keyword, include_dissolved)
-    if not courses:
-        return BaseResponse(success=False, message="No taught courses found", data=CoursePageDTO(courses=[], total=0))
     course_dtos = [to_course_dto(course) for course in courses]
     return BaseResponse(success=True, message="Courses retrieved", data=CoursePageDTO(courses=course_dtos, total=total))
 
@@ -72,8 +70,6 @@ def get_joined_courses(
     include_dissolved: bool = Query(True, description="是否包含已解散的课程")
 ):
     courses, total = fetch_joined_courses(db, current_user.id, page, page_size, keyword, include_dissolved)
-    if not courses:
-        return BaseResponse(success=False, message="No joined courses found", data=CoursePageDTO(courses=[], total=0))
     course_dtos = [to_course_dto(course) for course in courses]
     return BaseResponse(success=True, message="Courses retrieved", data=CoursePageDTO(courses=course_dtos, total=total))
 

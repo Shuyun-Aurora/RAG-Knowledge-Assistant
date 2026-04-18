@@ -410,6 +410,8 @@ class LightRAGKnowledgeGraph:
             nodes = []
             for node_data in graph_data.get("nodes", []):
                 props = node_data.get('properties', {})
+                # 课程归属必须以接口传入的 course_name 为准，不能相信模型从文档内容中猜出的值
+                props['course'] = course_name
                 props['entity_id'] = node_data['id']
                 props['entity_type'] = node_data['type']
                 self.logger.info(f"entity_type: { props['entity_type']}")
@@ -587,6 +589,9 @@ class LightRAGKnowledgeGraph:
                 self.logger.info(f"所有块处理完成，Total extracted: {len(all_nodes)} nodes, {len(all_edges)} edges")
 
                 merged_graph_data = self._merge_graph_with_deepseek(all_nodes, all_edges)
+                for node_data in merged_graph_data.get("nodes", []):
+                    node_data.setdefault("properties", {})
+                    node_data["properties"]["course"] = course_name
                 # 解析合并后的节点和边
                 nodes = [Node(**n) for n in merged_graph_data.get("nodes",[])]
                 edges = [Edge(**e) for e in merged_graph_data.get("edges",[])]
@@ -602,7 +607,7 @@ class LightRAGKnowledgeGraph:
                 self.logger.warning("No graph data extracted from text.")
                 return
             
-            graph= self._optimize_graph_structure(graph, filename)
+            graph= self._optimize_graph_structure(graph, filename, course_name)
 
             # 存储节点和边
             self.logger.info(f"Storing {len(graph.nodes)} nodes and {len(graph.edges)} edges...")
@@ -624,57 +629,60 @@ class LightRAGKnowledgeGraph:
                     self.logger.error(f"Error storing node {node.id}: {e}")
                     continue
 
-                self.logger.info(f"Successfully stored {stored_nodes}/{len(graph.nodes)} nodes")
+            self.logger.info(f"Successfully stored {stored_nodes}/{len(graph.nodes)} nodes")
 
-                # 存储边
-                stored_edges = 0
-                for i, edge in enumerate(graph.edges):
-                    # if debug:
-                    #     self.logger.debug(f"\n关系信息:")
-                    #     self.logger.debug(f"源节点: {edge.source}")
-                    #     self.logger.debug(f"目标节点: {edge.target}")
-                    #     self.logger.debug(f"关系类型: {edge.type}")
-                    #     self.logger.debug(f"关系属性: {edge.properties}")
+            # 存储边
+            stored_edges = 0
+            for i, edge in enumerate(graph.edges):
+                # if debug:
+                #     self.logger.debug(f"\n关系信息:")
+                #     self.logger.debug(f"源节点: {edge.source}")
+                #     self.logger.debug(f"目标节点: {edge.target}")
+                #     self.logger.debug(f"关系类型: {edge.type}")
+                #     self.logger.debug(f"关系属性: {edge.properties}")
 
-                    # 构建Cypher查询
-                    cypher = (
-                        f"MATCH (source) WHERE source.entity_id = $source_id "
-                        f"MATCH (target) WHERE target.entity_id = $target_id "
-                        f"MERGE (source)-[r:{edge.type}]->(target) "
-                        f"SET r += $properties "
-                        f"RETURN type(r) as relationType"
-                    )
+                # 构建Cypher查询
+                cypher = (
+                    f"MATCH (source) WHERE source.entity_id = $source_id "
+                    f"MATCH (target) WHERE target.entity_id = $target_id "
+                    f"MERGE (source)-[r:{edge.type}]->(target) "
+                    f"SET r += $properties "
+                    f"RETURN type(r) as relationType"
+                )
 
-                    # if debug:
-                    #     self.logger.debug(f"\n执行的Cypher查询:")
-                    #     self.logger.debug(cypher)
-                    #     self.logger.debug(f"参数: source_id={edge.source}, target_id={edge.target}, properties={edge.properties}")
+                # if debug:
+                #     self.logger.debug(f"\n执行的Cypher查询:")
+                #     self.logger.debug(cypher)
+                #     self.logger.debug(f"参数: source_id={edge.source}, target_id={edge.target}, properties={edge.properties}")
 
-                    try:
-                        async with self.driver.session(database="neo4j") as session:
-                            result = await session.run(
-                                cypher,
-                                source_id=edge.source,
-                                target_id=edge.target,
-                                properties=edge.properties
-                            )
-                            stored_edges += 1
-                            if (i + 1) % 20 == 0:  # 每20个边报告一次进度
-                                self.logger.info(f"Stored {stored_edges}/{len(graph.edges)} edges...")
-                            # if debug:
-                            #     records = await result.data()
-                            #     self.logger.debug(f"查询结果: {records}")
-                    except Exception as e:
-                        self.logger.error(f"Error creating relationship: {str(e)}")
+                try:
+                    async with self.driver.session(database="neo4j") as session:
+                        result = await session.run(
+                            cypher,
+                            source_id=edge.source,
+                            target_id=edge.target,
+                            properties=edge.properties
+                        )
+                        stored_edges += 1
+                        if (i + 1) % 20 == 0:  # 每20个边报告一次进度
+                            self.logger.info(f"Stored {stored_edges}/{len(graph.edges)} edges...")
                         # if debug:
-                        #     import traceback
-                        #     traceback.print_exc()
-                        continue
+                        #     records = await result.data()
+                        #     self.logger.debug(f"查询结果: {records}")
+                except Exception as e:
+                    self.logger.error(f"Error creating relationship: {str(e)}")
+                    # if debug:
+                    #     import traceback
+                    #     traceback.print_exc()
+                    continue
 
-                self.logger.info(f"Successfully stored {stored_edges}/{len(graph.edges)} edges")
+            self.logger.info(f"Successfully stored {stored_edges}/{len(graph.edges)} edges")
 
-                self.logger.info("Knowledge graph updated successfully.")
-                await self.link_course_root_to_subgraph_roots(course_name)
+            self.logger.info("Knowledge graph updated successfully.")
+            await self.link_course_root_to_subgraph_roots(
+                course_name,
+                file_root_id=f"fileroot_{filename}" if filename else None,
+            )
             
         except Exception as e:
             self.logger.error(f"Error building and storing graph: {e}")
@@ -686,34 +694,73 @@ class LightRAGKnowledgeGraph:
             # if debug:
             #     self.logger.setLevel(logging.INFO)
 
-    async def link_course_root_to_subgraph_roots(self, course_name: str):
+    async def link_course_root_to_subgraph_roots(self, course_name: str, file_root_id: Optional[str] = None):
         """
-        将 CourseRoot 节点与所有子图根节点（没有入边的 FileRoot 节点）连接。
-        """
-        cypher_find_file_roots = """
-        MATCH (n {course: $course_name, category: 'FileRoot'})
-        WHERE NOT (()-[]->(n))
-        RETURN n.entity_id AS sub_root_id
-        """
+        将 CourseRoot 节点与 FileRoot 节点连接。
 
+        优先连接当前文件对应的 FileRoot；如果没有传 file_root_id，则回退为
+        连接该课程下所有尚未挂到 CourseRoot 的 FileRoot。
+        """
         async with self.driver.session(database="neo4j") as session:
-            result = await session.run(cypher_find_file_roots, course_name=course_name)
-            records = await result.data()
-            sub_roots = [record["sub_root_id"] for record in records]
+            if file_root_id:
+                sub_roots = [file_root_id]
+            else:
+                cypher_find_file_roots = """
+                MATCH (n:FileRoot {course: $course_name, category: 'FileRoot'})
+                WHERE NOT (:CourseRoot)-[]->(n)
+                RETURN n.entity_id AS sub_root_id
+                """
+                result = await session.run(cypher_find_file_roots, course_name=course_name)
+                records = await result.data()
+                sub_roots = [record["sub_root_id"] for record in records]
+
+            if not sub_roots:
+                self.logger.warning(
+                    f"No FileRoot nodes found to link for course '{course_name}'"
+                )
+                return
+
+            linked_roots = []
+            course_root_id = f"{course_name}_root"
 
             for sub_root_id in sub_roots:
                 cypher_link = """
-                MATCH (root:CourseRoot {course: $course_name})
-                MATCH (n {entity_id: $sub_root_id, course: $course_name})
-                MERGE (root)-[r:CONTAINS {
-                    description: '课程根节点包含文件知识图谱根节点',
-                    strength: 'Strong',
-                    direction: 'CONTAINS'
-                }]->(n)
+                MERGE (root:CourseRoot {entity_id: $course_root_id})
+                ON CREATE SET
+                    root.entity_type = 'CourseRoot',
+                    root.name = $course_name,
+                    root.course = $course_name,
+                    root.description = $course_description,
+                    root.category = 'CourseRoot',
+                    root.content = $course_content
+                SET root:base
+                WITH root
+                MATCH (n:FileRoot {entity_id: $sub_root_id, course: $course_name})
+                MERGE (root)-[r:CONTAINS]->(n)
+                SET r.description = '课程根节点包含文件知识图谱根节点',
+                    r.strength = 'Strong',
+                    r.direction = 'CONTAINS'
+                RETURN n.entity_id AS linked_root_id
                 """
-                await session.run(cypher_link, course_name=course_name, sub_root_id=sub_root_id)
+                result = await session.run(
+                    cypher_link,
+                    course_root_id=course_root_id,
+                    course_name=course_name,
+                    sub_root_id=sub_root_id,
+                    course_description=f"课程{course_name}的根节点",
+                    course_content=f"课程{course_name}的根节点",
+                )
+                record = await result.single()
+                if record and record.get("linked_root_id"):
+                    linked_roots.append(record["linked_root_id"])
+                else:
+                    self.logger.warning(
+                        f"FileRoot '{sub_root_id}' was not linked to CourseRoot for course '{course_name}'"
+                    )
 
-            self.logger.info(f"已将 CourseRoot 与 {len(sub_roots)} 个 FileRoot 节点连接: {sub_roots}")
+            self.logger.info(
+                f"已将 CourseRoot 与 {len(linked_roots)} 个 FileRoot 节点连接: {linked_roots}"
+            )
 
     def _merge_graph_with_deepseek(self, nodes, edges):
         prompt = f"""
@@ -760,7 +807,7 @@ class LightRAGKnowledgeGraph:
         print(merged_graph_data)
         return merged_graph_data
 
-    def _optimize_graph_structure(self, graph, filename: str):
+    def _optimize_graph_structure(self, graph, filename: str, course_name: str):
         """
         对合并后的知识图谱进行结构优化：
         1. 删除冗余边（如a->b->c和a->c同时存在时删除a->c）
@@ -813,20 +860,37 @@ class LightRAGKnowledgeGraph:
             self.logger.error(f"破坏环时出错: {e}")
 
         try:
-            any_node = next(iter(G.nodes))
-            course = G.nodes[any_node]['node'].properties.get('course', '')
+            next(iter(G.nodes))
+            course = course_name
         except StopIteration:
             self.logger.error("空图，无法构建 FileRoot")
             return graph
 
-        # 4. 新建一个人工根节点（以课件 filename 为根）
-        from uuid import uuid4
+        # 4. 显式补上课程根节点和文件根节点，让 CourseRoot -> FileRoot 作为图的一部分一起落库
+        course_root_id = f"{course}_root"
+        file_root_id = f"fileroot_{filename}"
+
+        course_root_node = Node(
+            id=course_root_id,
+            labels=["CourseRoot"],
+            properties={
+                "entity_type": "CourseRoot",
+                "entity_id": course_root_id,
+                "importance": "",
+                "name": course,
+                "course": course,
+                "description": f"课程{course}的根节点",
+                "category": "CourseRoot",
+                "content": f"课程{course}的根节点"
+            }
+        )
+
         root_node = Node(
-            id=f"fileroot_{filename}",
+            id=file_root_id,
             labels=["FileRoot"],
             properties={
                 "entity_type": "FileRoot",
-                "entity_id": f"fileroot_{filename}",
+                "entity_id": file_root_id,
                 "name": filename,
                 "course": course,
                 "description": f"{filename} 根节点",
@@ -835,24 +899,39 @@ class LightRAGKnowledgeGraph:
                 "category": "FileRoot"
             }
         )
-        G.add_node(filename, node=root_node)
+
+        G.add_node(course_root_id, node=course_root_node)
+        G.add_node(file_root_id, node=root_node)
+
+        course_to_file_edge = Edge(
+            id=f"{course_root_id}_CONTAINS_{file_root_id}",
+            source=course_root_id,
+            target=file_root_id,
+            type="CONTAINS",
+            properties={
+                "description": "课程根节点包含文件知识图谱根节点",
+                "strength": "Strong",
+                "direction": "Forward",
+            }
+        )
+        G.add_edge(course_root_id, file_root_id, edge=course_to_file_edge, importance=0)
 
         # 5. 连接入度为0的原始节点
-        in_deg0_nodes = [n for n in G.nodes if G.in_degree(n) == 0 and n != filename]
+        in_deg0_nodes = [n for n in G.nodes if G.in_degree(n) == 0 and n not in {course_root_id, file_root_id}]
         for target_id in in_deg0_nodes:
-            edge_id = f"{filename}_CONTAINS_{target_id}_from_file"
+            edge_id = f"{file_root_id}_CONTAINS_{target_id}_from_file"
             edge = Edge(
                 id=edge_id,
-                source=f"fileroot_{filename}",
+                source=file_root_id,
                 target=target_id,
                 type="CONTAINS",
                 properties={
-                    "description": "{filename}包含知识点",
+                    "description": f"{filename}包含知识点",
                     "strength": "Strong",
                     "direction": "Forward",
                 }
             )
-            G.add_edge(filename, target_id, edge=edge, importance=0)
+            G.add_edge(file_root_id, target_id, edge=edge, importance=0)
 
         # 6. 返回新的图结构
         nodes = [G.nodes[n]['node'] for n in G.nodes if 'node' in G.nodes[n]]
