@@ -8,8 +8,6 @@ import PrivateLayout from './PrivateLayout';
 import CourseLayout from "./CourseLayout";
 import CourseHomePage from "../pages/CourseHomePage";
 import CourseMaterialsPage from "../pages/CourseMaterialsPage";
-import CourseKnowledgePage from "../pages/CourseKnowledgePage";
-import CourseQAPage from "../pages/CourseQAPage";
 import CourseExercisesPage from "../pages/CourseExercisesPage";
 import CourseCommunityPage from "../pages/CourseCommunityPage";
 import PostDetailPage from "../pages/PostDetailPage";
@@ -23,18 +21,16 @@ const AppRouter = () => {
       <Route path="/*" element={
         <PrivateLayout>
           <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/course/:id" element={<CourseLayout />}>
-                  <Route index element={<CourseHomePage />} />
-                  <Route path="materials" element={<CourseMaterialsPage />} />
-                  <Route path="knowledge" element={<CourseKnowledgePage />} />
-                  <Route path="qa" element={<CourseQAPage />} />
-                  <Route path="exercises" element={<CourseExercisesPage />} />
-                  <Route path="exercises/:exerciseId" element={<ExerciseDetailPage />} />
-                  <Route path="community" element={<CourseCommunityPage />} />
-                  <Route path="community/:postId" element={<PostDetailPage />} />
-              </Route>
+            <Route path="/" element={<Home />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/course/:id" element={<CourseLayout />}>
+              <Route index element={<CourseHomePage />} />
+              <Route path="materials" element={<CourseMaterialsPage />} />
+              <Route path="exercises" element={<CourseExercisesPage />} />
+              <Route path="exercises/:exerciseId" element={<ExerciseDetailPage />} />
+              <Route path="community" element={<CourseCommunityPage />} />
+              <Route path="community/:postId" element={<PostDetailPage />} />
+            </Route>
           </Routes>
         </PrivateLayout>
       } />
@@ -42,4 +38,4 @@ const AppRouter = () => {
   );
 };
 
-export default AppRouter; 
+export default AppRouter;
