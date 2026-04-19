@@ -52,17 +52,12 @@ const ExerciseDetailPage = () => {
   const renderFeedback = (exercise) => {
     const userAnswer = userAnswers[exercise.id];
     const correctAnswer = JSON.parse(exercise.answer);
-    const options = JSON.parse(exercise.options || '[]');
 
     let normalizedUserAnswer;
     if (exercise.type === 'single') {
-      const index = options.indexOf(userAnswer);
-      normalizedUserAnswer = String.fromCharCode(65 + index); // 'A', 'B', ...
+      normalizedUserAnswer = userAnswer || '';
     } else if (exercise.type === 'multiple') {
-      normalizedUserAnswer = (userAnswer || []).map(opt => {
-        const index = options.indexOf(opt);
-        return String.fromCharCode(65 + index);
-      }).sort();
+      normalizedUserAnswer = [...(userAnswer || [])].sort();
     } else if (exercise.type === 'blank') {
       normalizedUserAnswer = (userAnswer || '').split(',').map(s => s.trim());
       const isCorrect = normalizedUserAnswer.some(ans => correctAnswer.includes(ans));
