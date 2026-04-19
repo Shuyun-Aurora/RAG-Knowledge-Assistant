@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = "uploads"
     MAX_FILE_SIZE: int = 52428800
 
+    MONGODB_URI: str = "mongodb://localhost:27017"
+
     JWT_SECRET_KEY: str = "your-secret-key"
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60

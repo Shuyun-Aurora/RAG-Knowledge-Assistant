@@ -8,7 +8,7 @@
 - 练习题上传、查看、作答、删除
 - 课程社区发帖、评论、回复
 
-当前版本不再依赖 Neo4j、MongoDB、DashScope、DeepSeek，也不包含知识图谱、智能问答、习题推送等功能。
+当前版本不再依赖 Neo4j、DashScope、DeepSeek，也不包含知识图谱、智能问答、习题推送等功能。
 
 ## 1. 准备工作
 
@@ -24,6 +24,7 @@ E:\RAG-Knowledge-Assistant
 - Conda
 - MySQL
 - MySQL Workbench
+- MongoDB
 
 ## 2. 项目结构
 
@@ -111,14 +112,14 @@ pip install -r requirements.txt
 
 先从 `Code/backend/.env.example` 复制一份，命名为 `Code/backend/.env`。
 
-确认文件 `Code/backend/.env` 已正确填写。至少需要填写这些项目：
+确认文件 `Code/backend/.env` 已正确填写。需要填写这些项目：
 
 - `MYSQL_HOST`
 - `MYSQL_PORT`
 - `MYSQL_USER`
 - `MYSQL_PASSWORD`
 - `MYSQL_DB`
-- `JWT_SECRET_KEY`
+- `MONGODB_URI`
 
 ### 5.4 启动后端
 
@@ -135,8 +136,8 @@ http://127.0.0.1:8000
 
 ## 6. 推荐启动顺序
 
-1. 使用 VS Code 打开项目
-2. 导入并确认 MySQL 数据库可用
-3. 启动前端
-4. 激活 `rag` 环境
+1. 打开 VS Code 项目
+2. 启动前端
+3. 确认 MySQL 已导入并可用
+4. 激活 rag 环境
 5. 启动后端

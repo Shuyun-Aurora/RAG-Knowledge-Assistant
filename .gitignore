@@ -3,7 +3,6 @@
 # =============================
 Code/backend/.idea/
 Code/backend/chroma_db/
-Code/backend/uploads/
 Code/backend/.env
 Code/backend/**/__pycache__/       
 Code/backend/**/*.py[cod]      

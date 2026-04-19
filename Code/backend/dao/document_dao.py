@@ -23,11 +23,14 @@ class DocumentDAO:
         for doc in documents["items"]:
             result.append(
                 {
-                    "file_id": doc["file_id"],
+                    "file_id": str(doc.get("_id", doc.get("file_id"))),
                     "filename": doc.get("filename"),
-                    "upload_time": doc.get("upload_time"),
+                    "upload_time": (
+                        doc.get("upload_time")
+                        or (doc.get("uploadDate").strftime("%Y-%m-%d %H:%M:%S") if doc.get("uploadDate") else None)
+                    ),
                     "course": doc.get("metadata", {}).get("course"),
-                    "size": doc.get("size", 0),
+                    "size": doc.get("size", doc.get("length", 0)),
                 }
             )
         return result, documents["total"]
