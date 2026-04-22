@@ -1,0 +1,180 @@
+\documentclass[12pt,a4paper]{ctexart}
+
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{hyperref}
+
+\hypersetup{
+  hidelinks
+}
+
+\setlength{\parskip}{0.45em}
+\setlength{\parindent}{2em}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\heiti 测试计划}
+\end{center}
+
+\section{黑盒测试计划}
+
+\subsection{黑盒测试目标}
+
+黑盒测试重点检查主要功能、角色权限和核心业务流程是否符合需求。具体目标如下：
+
+\begin{enumerate}
+  \item 验证系统主要功能是否与需求描述一致。
+  \item 验证教师、学生两类角色的功能权限是否正确。
+  \item 验证课程平台核心业务流程能否端到端顺利完成。
+  \item 基于等价类、边界值、决策表和场景法设计测试用例。
+  \item 使用自动化接口测试与少量人工页面测试相结合的方式完成验证。
+\end{enumerate}
+
+\subsection{黑盒测试范围与重点}
+
+被测对象为当前仓库中的 \texttt{RAG-Knowledge-Assistant} 项目。该项目包含前端与后端两部分，功能覆盖用户管理、课程管理、课程资料管理、练习题管理和课程社区管理，满足课程作业对项目规模和功能点数量的要求。
+
+本次黑盒测试覆盖以下功能点：
+
+\begin{enumerate}
+  \item 用户注册
+  \item 用户登录
+  \item 个人信息查看
+  \item 个人信息修改
+  \item 教师创建课程
+  \item 学生加入课程
+  \item 学生退出课程
+  \item 课程资料上传
+  \item 教师解散课程
+  \item 课程资料查看
+  \item 课程资料下载
+  \item 课程资料 PDF 预览
+  \item 课程资料删除
+  \item 练习题上传
+  \item 练习题查看
+  \item 练习题作答
+  \item 作答结果反馈
+  \item 课程社区发帖
+  \item 课程社区评论
+  \item 课程社区回复
+  \item 核心流程黑盒验证
+\end{enumerate}
+
+重点检查以下内容：
+
+\begin{enumerate}
+  \item 不同角色的权限控制是否正确。
+  \item 各业务操作后的页面表现与数据状态是否一致。
+  \item 文件相关功能是否正确处理格式、大小限制和异常情况。
+  \item 练习题与课程社区功能是否能在课程上下文中正确关联。
+  \item 核心业务流程中的前后步骤是否能够正确衔接。
+\end{enumerate}
+
+核心流程定义为：
+
+\begin{quote}
+教师登录 $\rightarrow$ 创建课程 $\rightarrow$ 上传资料 $\rightarrow$ 上传练习题 $\rightarrow$ 学生登录 $\rightarrow$ 加入课程 $\rightarrow$ 查看资料 $\rightarrow$ 完成练习 $\rightarrow$ 获得反馈 $\rightarrow$ 参与课程社区发帖 / 评论 / 回复
+\end{quote}
+
+\subsection{黑盒测试方法}
+
+测试条件和测试用例主要采用以下方法设计：
+
+\subsubsection{等价类划分}
+
+将输入条件与业务状态划分为有效等价类和无效等价类，主要包括：
+
+\begin{enumerate}
+  \item 角色：教师、学生、非法角色。
+  \item 登录信息：正确账号密码、错误密码、未注册账号、空输入。
+  \item 文件类型：PDF、非 PDF、ZIP、超限文件。
+  \item 课程状态：未加入、已加入、已解散、非本人课程。
+\end{enumerate}
+
+\subsubsection{边界值分析}
+
+重点覆盖以下边界条件：
+
+\begin{enumerate}
+  \item 分页页码边界。
+  \item 文件大小上限边界。
+  \item 标题、描述、评论内容等空输入边界。
+  \item ZIP 压缩包单层目录与多层目录边界。
+  \item 练习题集题目数量边界。
+\end{enumerate}
+
+\subsubsection{决策表法}
+
+主要用于角色权限和条件组合较明显的场景，例如：
+
+\begin{enumerate}
+  \item 注册是否允许提交。
+  \item 登录是否成功。
+  \item 创建课程是否允许执行。
+  \item 加入课程、退出课程、解散课程是否满足角色与状态条件。
+  \item PDF 预览与评论回复是否满足前置条件。
+\end{enumerate}
+
+\subsubsection{场景法}
+
+用于验证跨模块核心流程，检查真实教学场景下业务操作能否连续完成，以及模块之间的数据关联与状态流转是否正确。
+
+\subsection{黑盒测试环境、工具与数据}
+
+\subsubsection{测试环境}
+
+\begin{enumerate}
+  \item 操作系统：Windows 11 开发环境。
+  \item 前端：React 19。
+  \item 后端：FastAPI。
+  \item 浏览器：Chrome 与 Edge。
+  \item 前端访问地址：\url{http://localhost:3000}。
+  \item 后端接口地址：\url{http://127.0.0.1:8000}。
+\end{enumerate}
+
+\subsubsection{测试工具}
+
+\begin{enumerate}
+  \item \texttt{Codex}：用于辅助梳理需求、编写测试计划、设计测试用例、生成自动化测试代码和整理测试结果。
+  \item \texttt{pytest + FastAPI TestClient}：用于执行自动化黑盒接口测试。
+  \item 浏览器人工操作：用于补充自动化测试难以完全覆盖的页面交互、PDF 预览、下载行为和页面级流程验证。
+\end{enumerate}
+
+\subsubsection{测试数据}
+
+\begin{enumerate}
+  \item 教师账号 1 个。
+  \item 学生账号 1 个。
+  \item 测试课程若干。
+  \item 测试资料若干，包含 PDF、非 PDF、ZIP 等文件。
+  \item 测试练习题集若干，覆盖单选、多选、填空三类题型。
+\end{enumerate}
+
+\subsection{黑盒测试执行安排}
+
+黑盒测试采用“自动化接口测试为主、少量人工页面测试为辅”的方式执行。自动化测试承担主体覆盖任务，人工测试主要补充前端页面交互、文件下载与 PDF 预览等浏览器行为验证。
+
+执行顺序如下：
+
+\begin{enumerate}
+  \item 环境与测试数据准备。
+  \item 用户管理模块测试。
+  \item 课程管理模块测试。
+  \item 课程资料管理模块测试。
+  \item 练习题管理模块测试。
+  \item 课程社区管理模块测试。
+  \item 核心流程端到端测试。
+  \item 回归验证与结果整理。
+\end{enumerate}
+
+测试优先级划分如下：
+
+\begin{enumerate}
+  \item \texttt{P0}：用户登录、教师创建课程、学生加入课程、资料上传、练习题查看与作答、核心流程贯通。
+  \item \texttt{P1}：用户注册、个人信息修改、资料下载、PDF 预览、社区发帖评论回复。
+  \item \texttt{P2}：课程搜索分页、资料列表分页、帖子搜索分页等辅助功能。
+\end{enumerate}
+
+\section{白盒测试计划}
+
+\end{document}

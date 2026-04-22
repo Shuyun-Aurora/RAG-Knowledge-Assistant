@@ -1,0 +1,117 @@
+\documentclass[12pt,a4paper]{ctexart}
+
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{hyperref}
+
+\hypersetup{
+  hidelinks
+}
+
+\setlength{\parskip}{0.45em}
+\setlength{\parindent}{2em}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\heiti 测试报告}
+\end{center}
+
+\section{黑盒测试报告}
+
+\subsection{测试概述}
+
+本次黑盒测试面向 \texttt{RAG-Knowledge-Assistant} 项目展开，围绕用户管理、课程管理、课程资料管理、练习题管理、课程社区管理以及核心业务流程，对系统主要业务功能进行验证。
+
+测试用例设计主要采用等价类划分、边界值分析、决策表法和场景法。测试执行采用“自动化接口测试为主、少量人工页面测试为辅”的方式，其中自动化测试承担主体覆盖任务，人工测试用于补充前端表单交互、PDF 预览、下载行为和页面级端到端流程验证，并结合实际运行结果与人工验证记录进行综合判断。
+
+\subsection{测试环境与工具}
+
+\subsubsection{测试环境}
+
+\begin{enumerate}
+  \item 操作系统：Windows 11 开发环境。
+  \item 前端：React 19。
+  \item 后端：FastAPI。
+  \item 浏览器：Chrome 与 Edge。
+  \item 前端访问地址：\url{http://localhost:3000}。
+  \item 后端接口地址：\url{http://127.0.0.1:8000}。
+  \item 自动化测试环境：SQLite 测试库用于承载关系型业务数据；资料模块使用文档存储替身模拟文件行为。
+\end{enumerate}
+
+\subsubsection{测试工具}
+
+\begin{enumerate}
+  \item \texttt{Codex}：用于辅助生成测试计划、测试用例、自动化测试代码和测试报告整理内容。
+  \item \texttt{pytest + FastAPI TestClient}：用于执行自动化黑盒接口测试。
+  \item 浏览器人工操作：用于执行少量页面黑盒验证。
+\end{enumerate}
+
+\subsection{测试执行结果}
+
+\subsubsection{自动化测试结果}
+
+自动化黑盒测试共执行 36 项，全部通过。
+
+执行命令：
+
+\begin{verbatim}
+D:\miniconda3\envs\rag\python.exe -m pytest -q
+\end{verbatim}
+
+执行结果：
+
+\begin{verbatim}
+36 passed, 9 warnings
+\end{verbatim}
+
+自动化测试已覆盖用户管理、课程管理、资料管理、练习题管理、课程社区管理以及核心流程的主要黑盒接口验证，具体包括注册、登录、个人信息查看与修改、课程创建、加入与退出、资料上传、查看与删除、练习题查看与作答、社区发帖、评论、回复等主要功能点。
+
+\subsubsection{人工测试结果}
+
+人工黑盒测试共执行 10 项，全部通过。
+
+人工测试主要补充验证了以下内容：
+
+\begin{enumerate}
+  \item 注册页确认密码校验与角色选择校验
+  \item 登录后首页跳转、身份状态展示与刷新后的登录状态保持
+  \item PDF 资料预览效果与页面展示情况
+  \item 资料下载时的浏览器下载行为
+  \item 练习题页面反馈展示与“重新作答”后的状态恢复
+  \item 匿名发帖与匿名评论的展示效果
+  \item 回复评论后的页面定位与回显
+  \item 页面级核心流程端到端验证
+\end{enumerate}
+
+\subsubsection{综合统计}
+
+\begin{enumerate}
+  \item 自动化测试：36 项，通过 36 项。
+  \item 人工测试：10 项，通过 10 项。
+  \item 黑盒测试总执行数：46 项。
+  \item 黑盒测试总通过数：46 项。
+\end{enumerate}
+
+自动化测试与人工测试结果一致，计划范围内的主要黑盒功能均完成验证。
+
+\subsection{缺陷与问题分析}
+
+本次黑盒测试未发现阻塞主要业务流程的严重缺陷，系统主要功能能够按需求正常运行，未出现导致系统无法使用、核心流程中断或角色权限错误的问题。
+
+测试过程中记录到的轻微问题或风险如下：
+
+\begin{enumerate}
+  \item 回复评论定位功能在页面滚动距离较长时，定位体验可能不够稳定。该问题未导致功能失效，因此未判定为失败项，但建议在后续版本中优化页面滚动与定位交互体验。
+  \item 自动化测试执行中出现若干技术栈弃用警告。
+  这些警告主要与 Pydantic、SQLAlchemy 和 FastAPI 的版本兼容提示有关，不影响本次黑盒测试通过结果，但说明项目后续存在升级维护需求。
+\end{enumerate}
+
+\subsection{测试结论}
+
+本次黑盒测试结果表明，\texttt{RAG-Knowledge-Assistant} 项目在当前测试范围内整体表现良好，主要业务功能满足需求说明文档要求，教师与学生角色权限控制正确，课程平台核心业务流程能够顺利完成。
+
+综合自动化测试与人工测试结果，可以认为该系统在黑盒测试范围内达到了课程作业要求，具备较好的功能完整性和可用性。
+
+\section{白盒测试报告}
+
+\end{document}

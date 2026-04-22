@@ -1,0 +1,105 @@
+\documentclass[12pt,a4paper]{ctexart}
+
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{float}
+
+\hypersetup{
+  hidelinks
+}
+
+\setlength{\parskip}{0.45em}
+\setlength{\parindent}{2em}
+\graphicspath{{黑盒测试对话截图/}}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\heiti 基于大模型的软件测试使用记录}
+\end{center}
+
+\section{黑盒测试使用记录}
+
+\subsection{任务一：测试计划}
+
+先向模型说明课程作业要求，并请模型判断当前应优先完成的任务。随后继续要求模型检查《黑盒测试计划》是否有多余内容，并按更贴合作业要求的方式调整文档结构。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{任务1开始.png}
+  \caption{任务一开始：提供课程作业要求，并请模型先完成黑盒测试计划}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{任务1改进.png}
+  \caption{任务一改进：继续检查测试计划是否存在多余内容并进行精简}
+\end{figure}
+
+\subsection{任务二：测试用例}
+
+继续让模型完成黑盒测试用例设计。模型根据前面的任务顺序判断，继续生成黑盒测试用例，并说明已经覆盖用户、课程、资料、练习题、社区和核心流程等模块。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{任务2开始.png}
+  \caption{任务二：构造黑盒测试用例}
+\end{figure}
+
+\subsection{任务三：生成并执行黑盒测试}
+
+这一阶段主要涉及“第三项任务到底是什么”“是否要先写测试代码”“自动化测试是否偏离黑盒测试”“是否需要少量人工补充”等问题。从编写自动化测试代码，到执行测试，再到继续调整测试结构和说明黑盒边界，相关交互见下列截图。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{任务3开始.png}
+  \caption{任务三开始：初次确认第三项任务应围绕生成并执行黑盒测试展开}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{任务3调整.png}
+  \caption{任务三调整：围绕“测试代码为主、必要时少量人工”的要求调整测试方案}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{任务3继续.png}
+  \caption{任务三继续：继续第三项任务，模型搭建自动化黑盒测试代码并给出执行结果}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{任务3检验.png}
+  \caption{任务三检验：继续检验 \texttt{pytest}、黑盒测试边界与人工测试定位}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{任务3补充.png}
+  \caption{任务三补充：补充说明课程作业要求与任务顺序之间的关系}
+\end{figure}
+
+\subsection{任务四：执行记录与测试报告}
+
+这一阶段主要是整理测试执行记录、编写测试报告，并继续检查测试计划与测试报告是否存在冗余内容。模型根据执行结果汇总自动化测试与人工测试数据，并继续对文档结构和表述方式进行修改。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{任务4开始.png}
+  \caption{任务四开始：整理测试执行记录并编写测试报告}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.92\textwidth]{任务4改进.png}
+  \caption{任务四改进：继续检查并精修测试计划与测试报告}
+\end{figure}
+
+
+\section{白盒测试使用记录}
+
+预留给后续白盒测试成员补充截图和简要说明。
+
+\end{document}
