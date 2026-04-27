@@ -4,6 +4,7 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{float}
+\usepackage{caption}
 
 \hypersetup{
   hidelinks
@@ -11,7 +12,24 @@
 
 \setlength{\parskip}{0.45em}
 \setlength{\parindent}{2em}
-\graphicspath{{黑盒测试对话截图/}}
+\graphicspath{{黑盒测试对话截图/}{白盒测试对话截图1/}}
+
+% 白盒截图占位：图片未放入时也可编译，并提示应放置内容
+\newcommand{\recordfig}[3]{
+  \begin{figure}[H]
+    \centering
+    \IfFileExists{#1}{
+      \includegraphics[width=0.92\textwidth]{#1}
+    }{
+      \fbox{\parbox{0.88\textwidth}{
+        \textbf{截图占位（待补充）}\\
+        预期文件：\texttt{#1}\\
+        建议内容：#3
+      }}
+    }
+    \caption{#2}
+  \end{figure}
+}
 
 \begin{document}
 
@@ -100,6 +118,78 @@
 
 \section{白盒测试使用记录}
 
-预留给后续白盒测试成员补充截图和简要说明。
+本节记录我作为白盒测试负责人一，与大模型协作完成白盒测试计划、测试实现、执行修复和文档收敛的关键交互过程。由于历史对话较长，这里仅保留关键节点与代表性提示词。
+
+\subsection{任务一：测试计划}
+
+我先向模型提供课程作业要求、分工说明和现有文档状态，明确我作为白盒负责人一的身份。模型据此先读取《小组分工与文档格式》《测试计划》与《需求说明文档》及相关代码，然后确认白盒计划应围绕我负责的后端核心链路展开。
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\textwidth]{白盒测试对话截图1/测试计划生成.png}
+  \caption{测试计划初步生成：提供作业要求、成员分工与当前文档状态}
+  \label{fig:test-plan-generation}
+\end{figure}
+
+我发现模型对白盒测试的理解有一定偏离，我要求它不要对每层进行单独测试，而是贯通controller->service->dao->repository层。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{白盒测试对话截图1/测试计划迭代1.png}
+  \caption{测试计划迭代：明确贯通测试的需求}
+\end{figure}
+
+我要求模型将覆盖率、基本路径、数据流三类方法都要落地。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{白盒测试对话截图1/测试计划迭代2.png}
+  \caption{测试计划迭代：根据基本路径及数据流完善测试}
+\end{figure}
+
+我还进行了一些追问，模型持续修正细节，我也在问答中深化了我对白盒测试核心逻辑的理解（图略）。
+
+\subsection{任务二：测试代码生成、执行、失败定位与修复}
+
+进入执行阶段后，模型按我负责范围运行 \texttt{pytest} 并回看失败栈，完成修复，最后重新执行回归确认。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{白盒测试对话截图1/测试代码生成.png}
+  \caption{测试代码生成及修复}
+\end{figure}
+
+由于测试代码对dao, repository层的覆盖率不足，模型试图对它们进行单独测试，被我阻止，澄清贯通测试的需求。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{白盒测试对话截图1/测试覆盖率提高.png}
+  \caption{澄清测试覆盖率提高方法}
+\end{figure}
+
+让模型补完用例后自己运行并查看覆盖率，如果没有命中的部分还能靠补用例来命中，就继续补充，直到未命中部分都是真正无法到达的代码。同时，分析未覆盖原因。
+
+{\centering
+\includegraphics[width=0.8\textwidth]{白盒测试对话截图1/未命中原因.png}
+\captionof{figure}{未覆盖原因}
+\par}
+
+\subsection{任务三：执行记录与测试报告}
+
+在覆盖率达到要求后，我要求模型根据测试结果，生成测试报告。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{白盒测试对话截图1/测试报告.png}
+  \caption{测试报告}
+\end{figure}
+
+调整测试报告。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{白盒测试对话截图1/测试报告修改.png}
+  \caption{测试报告修改}
+\end{figure}
 
 \end{document}

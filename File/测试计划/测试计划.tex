@@ -245,7 +245,7 @@
 
 \subsubsection{数据流分析}
 
-围绕关键变量的定义（Def）与使用（Use）关系构造测试，重点关注“接口参数定义 $\rightarrow$ 服务处理 $\rightarrow$ 数据访问使用 $\rightarrow$ 异常返回”的变量传播一致性。主要包括：
+本阶段采用面向关键变量传播链的 Def-Use 验证思路，围绕“接口参数定义 $\rightarrow$ 服务处理 $\rightarrow$ 数据访问使用 $\rightarrow$ 异常返回”检查变量在跨层调用中的一致性与可追踪性。该方法重点验证核心变量链路，不以完整 DU 路径穷尽为本阶段目标。主要包括：
 
 \begin{enumerate}
   \item 用户身份与角色变量（\texttt{current\_user.id}、\texttt{current\_user.role}）在鉴权、权限判断与后续业务调用中的使用关系。
