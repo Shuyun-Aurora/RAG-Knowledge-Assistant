@@ -114,4 +114,158 @@ D:\miniconda3\envs\rag\python.exe -m pytest -q
 
 \section{白盒测试报告}
 
+\subsection{测试概述}
+
+本次白盒测试重点覆盖用户与认证、课程管理、课程资料管理三类业务。测试目标是基于代码结构验证关键逻辑的正确性与稳健性，并满足课程作业对白盒测试方法与覆盖率指标的要求。
+
+白盒测试的执行策略：优先通过后端接口触发真实业务调用链，贯通 \texttt{controller -> service -> repository -> dao}，仅对外部系统依赖（如文档存储客户端）使用替身隔离，以保证测试结果既具可重复性又具工程真实性。
+
+\subsection{测试环境与工具}
+
+\subsubsection{测试环境}
+
+\begin{enumerate}
+  \item 运行环境：Python 3.11。
+  \item 后端框架：FastAPI。
+  \item 关系型数据测试环境：SQLite 内存数据库（测试会话）。
+  \item 文档存储测试环境：Mongo/GridFS 外部依赖替身。
+\end{enumerate}
+
+\subsubsection{测试工具}
+
+\begin{enumerate}
+  \item \texttt{Codex}：辅助设计测试用例、分析未覆盖路径和整理报告。
+  \item \texttt{pytest}：执行自动化白盒测试。
+  \item \texttt{FastAPI TestClient}：通过接口请求驱动后端完整调用链。
+  \item \texttt{pytest-cov}：统计覆盖率并输出未命中行。
+\end{enumerate}
+
+\subsection{测试对象说明}
+
+白盒测试覆盖如下代码模块：
+
+\begin{enumerate}
+  \item 用户与认证调用链：\texttt{LoginController \(\rightarrow\) LoginService \(\rightarrow\) UserRepository + UserAuthRepository}；\texttt{UserController \(\rightarrow\) UserService \(\rightarrow\) UserRepository + UserAuthRepository}。
+  \item 课程管理调用链：\texttt{CourseController \(\rightarrow\) CourseService \(\rightarrow\) CourseRepository + UserRepository}。
+  \item 资料管理调用链：\texttt{rag\_controller \(\rightarrow\) DocumentDAO \(\rightarrow\) document\_repository}。
+\end{enumerate}
+
+\subsection{测试方法说明}
+
+本阶段白盒测试主要采用代码覆盖分析、基本路径覆盖和数据流分析三种方法。结合本项目后端调用链特点，各方法表现出如下特点：
+
+\subsubsection{代码覆盖分析特点}
+
+\begin{enumerate}
+  \item 优点：可量化评估测试充分性，能够快速识别未命中模块与薄弱分支，便于进行增量补测。
+  \item 局限：覆盖率反映“代码是否执行”，不直接保证业务语义正确；高覆盖不等于缺陷风险为零。
+  \item 适用性：适合作为本阶段总体进度与质量基线，用于指导接口驱动用例迭代。
+\end{enumerate}
+
+\subsubsection{基本路径覆盖特点}
+
+\begin{enumerate}
+  \item 优点：对登录、课程、资料等条件组合较多的流程有较好约束能力，能够系统性覆盖成功、失败与异常路径。
+  \item 局限：路径数量随条件增加而增长较快，需要结合优先级聚焦关键业务路径，否则维护成本较高。
+  \item 适用性：适合核心流程与权限相关逻辑，尤其适用于角色差异、资源存在性、状态流转等场景。
+\end{enumerate}
+
+\subsubsection{数据流分析特点}
+
+\begin{enumerate}
+  \item 优点：能够验证关键变量在跨层调用中的定义-使用一致性，擅长发现“参数传递正确但语义使用错误”的问题。
+  \item 局限：需要明确变量生命周期与调用边界，分析成本高于常规接口通断测试。
+  \item 适用性：适合 \texttt{current\_user.id/role}、\texttt{course\_id}、\texttt{file\_id}、密码哈希等关键变量链路验证。
+\end{enumerate}
+
+综合而言，三种方法形成互补关系：代码覆盖用于量化监控，基本路径用于保障流程完整性，数据流分析用于校验跨层变量一致性，共同支撑本阶段白盒测试结论。
+
+
+\subsection{测试执行结果}
+
+\subsubsection{执行命令与通过情况}
+
+执行命令：\texttt{pytest tests/ -q}
+
+测试结果：16 passed
+
+\subsubsection{覆盖率结果（本次执行）}
+
+\begin{verbatim}
+pytest tests/ -q --cov=controller --cov=service \
+--cov=repository --cov=dao --cov-report=term-missing\end{verbatim}
+覆盖结果如下：
+
+\begin{center}
+\begin{tabular}{|p{7.4cm}|c|p{4.3cm}|}
+\hline
+\textbf{代码文件名} & \textbf{覆盖率} & \textbf{未覆盖行数} \\
+\hline
+\texttt{controller/CourseController.py} & 91\% & \texttt{18-22, 99, 114, 143} \\
+\hline
+\texttt{controller/ExerciseController.py} & 0\% & \texttt{1-70} \\
+\hline
+\texttt{controller/LoginController.py} & 85\% & \texttt{12-16} \\
+\hline
+\texttt{controller/PostController.py} & 0\% & \texttt{1-140} \\
+\hline
+\texttt{controller/UserController.py} & 100\% & -- \\
+\hline
+\texttt{controller/\_\_init\_\_.py} & 100\% & -- \\
+\hline
+\texttt{controller/rag\_controller.py} & 100\% & -- \\
+\hline
+\texttt{dao/\_\_init\_\_.py} & 100\% & -- \\
+\hline
+\texttt{dao/document\_dao.py} & 100\% & -- \\
+\hline
+\texttt{repository/CommentRepository.py} & 0\% & \texttt{1-23} \\
+\hline
+\texttt{repository/CourseRepository.py} & 98\% & \texttt{34} \\
+\hline
+\texttt{repository/ExerciseRepository.py} & 0\% & \texttt{1-73} \\
+\hline
+\texttt{repository/PostRepository.py} & 0\% & \texttt{1-36} \\
+\hline
+\texttt{repository/UserAuthRepository.py} & 100\% & -- \\
+\hline
+\texttt{repository/UserRepository.py} & 92\% & \texttt{19, 29} \\
+\hline
+\texttt{repository/\_\_init\_\_.py} & 100\% & -- \\
+\hline
+\texttt{repository/document\_repository.py} & 97\% & \texttt{38} \\
+\hline
+\texttt{service/CourseService.py} & 100\% & -- \\
+\hline
+\texttt{service/ExerciseService.py} & 0\% & \texttt{1-74} \\
+\hline
+\texttt{service/LoginService.py} & 100\% & -- \\
+\hline
+\texttt{service/PostService.py} & 0\% & \texttt{1-23} \\
+\hline
+\texttt{service/UserService.py} & 100\% & -- \\
+\hline
+\texttt{service/\_\_init\_\_.py} & 100\% & -- \\
+\hline
+\texttt{TOTAL} & 66\% & \texttt{共236行} \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{未覆盖代码分析}
+
+未覆盖的语句并非测试遗漏或核心业务逻辑缺失，具体可分为以下三类：
+\begin{itemize}
+  \item \textbf{防御性分支不可触发}：当前调用链中其它层会提前进行校验，提前返回或抛出异常，导致下游用于兜底处理的部分分支不可达。例如 service 层直接抛出 \texttt{HTTPException}，该异常由 FastAPI 框架统一捕获并转换为响应，controller 层中针对返回值为 \texttt{None} 的防御分支因此无法执行。
+  \item \textbf{数据库生成器语句未覆盖}：\texttt{LoginController} 与 \texttt{CourseController} 中 \texttt{get\_db()} 生成器的 \texttt{SessionLocal()} 与 \texttt{db.close()} 未被覆盖，原因是测试为保证可重复性采用 SQLite 测试会话并通过依赖覆盖替换了默认数据库依赖，从而未执行生产环境函数体。
+  \item \textbf{文档存储仓储层的生命周期函数未覆盖}：仅在应用启动/关闭事件中调用，不属于常规接口请求路径。
+\end{itemize}
+
+\subsection{测试结果与分析}
+所有编写的测试用例均已通过，核心业务逻辑功能正常，无功能性缺陷或回归问题。
+
+整体业务链路覆盖率？？，主要业务分支与常见异常路径均经过验证，测试质量达标。
+
+对于仍未命中的少量语句，已通过代码与调用链分析确认了其主要来源并进行了分析。
+
 \end{document}

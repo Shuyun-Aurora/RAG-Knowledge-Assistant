@@ -177,4 +177,133 @@
 
 \section{白盒测试计划}
 
+\subsection{白盒测试目标}
+
+白盒测试重点检查成员 B 负责业务在后端完整调用链中的分支处理、路径可达性与数据定义使用关系是否正确。具体目标如下：
+
+\begin{enumerate}
+  \item 以“模块一体化测试”为原则，在同一用例中联合验证 \texttt{controller -> service -> dao -> repository} 调用链一致性。
+  \item 覆盖登录认证、用户信息、课程管理、课程资料管理四类业务在各层的关键逻辑。
+  \item 基于代码覆盖、基本路径覆盖和数据流分析三种方法设计并执行测试用例。
+  \item 通过 \texttt{pytest + coverage} 统计覆盖率，确保本人负责模块对应后端代码总体覆盖率不低于 \texttt{95\%}。
+  \item 使用 \texttt{Codex} 辅助完成测试用例补全、覆盖率分析和测试报告生成，形成智能化测试工作流。
+\end{enumerate}
+
+\subsection{白盒测试范围与被测代码模块}
+
+本次白盒测试范围限定为成员 B 负责业务对应的后端模块代码，覆盖用户与认证、课程管理、课程资料管理三类业务。
+
+被测后端模块代码如下（包含控制、服务与数据访问实现）：
+
+\begin{enumerate}
+  \item \texttt{Code/backend/controller/LoginController.py}
+  \item \texttt{Code/backend/controller/UserController.py}
+  \item \texttt{Code/backend/controller/CourseController.py}
+  \item \texttt{Code/backend/controller/rag\_controller.py}
+  \item \texttt{Code/backend/service/LoginService.py}
+  \item \texttt{Code/backend/service/UserService.py}
+  \item \texttt{Code/backend/service/CourseService.py}
+  \item \texttt{Code/backend/dao/document\_dao.py}
+  \item \texttt{Code/backend/repository/UserRepository.py}
+  \item \texttt{Code/backend/repository/UserAuthRepository.py}
+  \item \texttt{Code/backend/repository/CourseRepository.py}
+  \item \texttt{Code/backend/repository/document\_repository.py}
+\end{enumerate}
+
+覆盖目标如下：
+
+\begin{enumerate}
+  \item 一体化覆盖：同一业务用例贯通接口处理、业务决策、数据访问与状态变更。
+  \item 关键业务分支（成功、失败、权限拒绝、资源不存在、重复操作、文件超限）均被执行。
+  \item 相关后端代码总体覆盖率不低于 \texttt{95\%}。
+\end{enumerate}
+
+\subsection{白盒测试方法}
+
+测试用例主要按照以下三类白盒方法生成并执行：
+
+\subsubsection{代码覆盖分析}
+
+以代码覆盖率为核心指标，采用“控制器输入驱动”方式组织覆盖：通过接口请求触发完整后端调用链 \texttt{controller -> service -> dao -> repository}，仅对 Mongo/GridFS 等外部系统依赖使用替身隔离。按业务链路规划覆盖点如下：
+
+\begin{enumerate}
+  \item 登录认证链路：注册、登录、鉴权、改密、资料更新及对应异常返回分支。
+  \item 课程管理链路：角色权限、课程存在性、课程状态（正常/已解散）、加入/退出/解散与持久化分支。
+  \item 资料管理链路：上传类型判断（普通文件/ZIP）、大小限制、存储访问、下载与预览分支。
+\end{enumerate}
+
+\subsubsection{基本路径覆盖}
+
+对条件组合较多的接口流程进行路径拆分，确保关键独立路径至少执行一次，并兼顾成功路径、失败路径与异常路径。重点路径包括：
+
+\begin{enumerate}
+  \item 登录链路：用户存在/不存在、密码匹配/不匹配、无效 token、用户不存在时鉴权失败。
+  \item 用户资料链路：旧密码正确/错误、认证信息存在/不存在、资料更新成功/异常。
+  \item 课程链路：创建成功/权限拒绝、加入成功/重复加入/课程不存在/课程已解散、退出成功/未加入/课程不存在、解散成功/无权限/已解散/课程不存在。
+  \item 资料链路：普通上传成功、ZIP 单层目录上传成功、ZIP 嵌套目录拒绝、单文件超限、批量总大小超限、下载/预览/删除的成功与文件不存在异常。
+\end{enumerate}
+
+\subsubsection{数据流分析}
+
+围绕关键变量的定义（Def）与使用（Use）关系构造测试，重点关注“接口参数定义 $\rightarrow$ 服务处理 $\rightarrow$ 数据访问使用 $\rightarrow$ 异常返回”的变量传播一致性。主要包括：
+
+\begin{enumerate}
+  \item 用户身份与角色变量（\texttt{current\_user.id}、\texttt{current\_user.role}）在鉴权、权限判断与后续业务调用中的使用关系。
+  \item 认证数据（\texttt{hashed\_password}）在生成、存储、校验、更新过程中的定义与使用关系。
+  \item 课程标识（\texttt{course\_id}）在查询、加入、退出、解散流程中的跨层传递关系与异常中断路径。
+  \item 文件标识（\texttt{file\_id}）在下载、预览、删除流程中的传递与读取关系。
+  \item 文件大小相关变量（单文件大小、总大小）在上传流程中的累计比较与阈值判断关系。
+\end{enumerate}
+
+\subsection{白盒测试工具与数据}
+
+\subsubsection{测试环境}
+
+\begin{enumerate}
+  \item 运行环境：Python 3.11。
+  \item 后端框架：FastAPI。
+  \item 关系型数据测试环境：SQLite 内存数据库（测试会话）。
+  \item 文档存储测试环境：Mongo/GridFS 外部依赖替身。
+\end{enumerate}
+
+\subsubsection{测试工具}
+
+\begin{enumerate}
+  \item \texttt{Codex}：辅助设计测试用例、分析未覆盖路径和整理报告。
+  \item \texttt{pytest}：执行自动化白盒测试。
+  \item \texttt{FastAPI TestClient}：通过接口请求驱动后端完整调用链。
+  \item \texttt{pytest-cov}：统计覆盖率并输出未命中行。
+\end{enumerate}
+
+\subsubsection{测试数据}
+
+\begin{enumerate}
+  \item 教师与学生模拟用户对象各 1 组。
+  \item 课程对象、课程列表和分页参数模拟数据若干。
+  \item 文档上传测试文件：PDF、TXT、ZIP（单层目录/嵌套目录）等样本、小于限制或超过限制的样本。
+\end{enumerate}
+
+\subsection{白盒测试执行安排}
+
+白盒测试按“模块一体化执行、覆盖率补齐、回归验证”的方式执行，每个模块直接走完整后端调用链。
+
+执行顺序如下：
+
+\begin{enumerate}
+  \item 环境准备与依赖安装（\texttt{pytest}、\texttt{coverage}）。
+  \item 核心业务模块一体化测试：分别对用户认证、课程管理、资料管理等模块执行完整后端调用链测试。
+  \item 数据链路一致性验证：针对每个核心业务模块，自动化验证接口输入、数据库变更、接口输出三者之间的数据一致性与状态同步正确性。
+  \item 覆盖率统计、薄弱路径定位与用例增补。
+  \item 回归执行并固化测试结果。
+  \item 生成测试报告。
+\end{enumerate}
+
+\subsection{白盒测试风险与说明}
+
+\begin{enumerate}
+  \item 一体化测试中部分数据库与文件存储行为通过替身对象模拟，需在集成环境补充真实依赖联调。
+  \item 文档存储相关逻辑受 MongoDB/GridFS 环境影响，测试环境与部署环境差异可能导致问题。
+  \item 覆盖率仅反映代码执行比例，不等同于缺陷零风险，需结合路径与数据流结果及其它测试综合评估。
+\end{enumerate}
+
 \end{document}
