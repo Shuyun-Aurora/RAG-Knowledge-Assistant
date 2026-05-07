@@ -12,7 +12,7 @@
 
 \setlength{\parskip}{0.45em}
 \setlength{\parindent}{2em}
-\graphicspath{{黑盒测试对话截图/}{白盒测试对话截图1/}}
+\graphicspath{{黑盒测试对话截图/}{白盒测试对话截图1/}{白盒测试2对话截图/}}
 
 % 白盒截图占位：图片未放入时也可编译，并提示应放置内容
 \newcommand{\recordfig}[3]{
@@ -118,9 +118,10 @@
 
 \section{白盒测试使用记录}
 
-本节记录我作为白盒测试负责人一，与大模型协作完成白盒测试计划、测试实现、执行修复和文档收敛的关键交互过程。由于历史对话较长，这里仅保留关键节点与代表性提示词。
+本节记录我与大模型协作完成白盒测试的关键交互过程，包含负责人一与负责人二两部分内容。由于历史对话较长，这里仅保留关键节点与代表性提示词。
 
-\subsection{任务一：测试计划}
+\subsection{用户与认证、课程管理、课程资料管理}
+\subsubsection{任务一：测试计划}
 
 我先向模型提供课程作业要求、分工说明和现有文档状态，明确我作为白盒负责人一的身份。模型据此先读取《小组分工与文档格式》《测试计划》与《需求说明文档》及相关代码，然后确认白盒计划应围绕我负责的后端核心链路展开。
 
@@ -149,7 +150,7 @@
 
 我还进行了一些追问，模型持续修正细节，我也在问答中深化了我对白盒测试核心逻辑的理解（图略）。
 
-\subsection{任务二：测试代码生成、执行、失败定位与修复}
+\subsubsection{任务二：测试代码生成、执行、失败定位与修复}
 
 进入执行阶段后，模型按我负责范围运行 \texttt{pytest} 并回看失败栈，完成修复，最后重新执行回归确认。
 
@@ -174,7 +175,7 @@
 \captionof{figure}{未覆盖原因}
 \par}
 
-\subsection{任务三：执行记录与测试报告}
+\subsubsection{任务三：执行记录与测试报告}
 
 在覆盖率达到要求后，我要求模型根据测试结果，生成测试报告。
 
@@ -190,6 +191,104 @@
   \centering
   \includegraphics[width=0.8\textwidth]{白盒测试对话截图1/测试报告修改.png}
   \caption{测试报告修改}
+\end{figure}
+
+\subsection{练习管理与课程社区模块}
+
+\subsubsection{任务一：测试计划}
+
+我先提供了作业要求、个人分工与任务顺序，要求模型严格按顺序执行；随后对《测试计划-白盒测试-练习与社区模块》进行精修，删除冗余描述并保留必要边界说明。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{白盒测试2对话截图/任务1-测试计划-1.png}
+  \caption{任务一：提供作业要求与分工，启动测试计划}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.82\textwidth]{白盒测试2对话截图/任务1-测试计划-2-修改.png}
+  \caption{任务一：按统一格式精修测试计划并删除冗余内容}
+\end{figure}
+
+\subsubsection{任务二：构造测试用例}
+
+在仅推进第二项任务的约束下，模型完成两个模块白盒用例集：练习模块 12 个、社区模块 11 个，另含 3 个缺陷触发补充用例，并对每个用例给出输入、步骤与预期结果。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.82\textwidth]{白盒测试2对话截图/任务2-构造测试用例-1.png}
+  \caption{任务二：构造练习与社区模块白盒测试用例}
+\end{figure}
+
+\subsubsection{任务三：编写并执行测试代码}
+
+根据已构造用例，模型在 \texttt{conftest.py}、\texttt{test\_exercise\_module.py}、\texttt{test\_post\_module.py} 等文件落地测试并执行。初始结果为 \texttt{23 passed, 3 xfailed}。随后我发现了\texttt{xfailed}和之前知道的 \texttt{failed}不一样，于是追问了 \texttt{xfailed} 与 \texttt{failed} 的语义差异，并要求把缺陷用例改为普通失败以便在报告中直观展示真实缺陷。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.82\textwidth]{白盒测试2对话截图/任务3-编写测试代码-1.png}
+  \caption{任务三：测试代码生成与首轮执行（23 passed, 3 xfailed）}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.82\textwidth]{白盒测试2对话截图/任务3-编写测试代码-2-fail情况.png}
+  \caption{任务三：追问 xfailed 的含义与缺陷对应关系}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.82\textwidth]{白盒测试2对话截图/任务3-编写测试代码-3-fail追问.png}
+  \caption{任务三：澄清 xfailed 与 failed 的质量语义差异}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.82\textwidth]{白盒测试2对话截图/任务3-编写测试代码-4-fail修改.png}
+  \caption{任务三：将 xfailed 改为 failed，结果变为 3 failed, 23 passed}
+\end{figure}
+
+\subsubsection{任务四：覆盖率统计与分析}
+
+我要求模型先判断下一步任务，模型确认应先做覆盖率统计与分析，再进入报告撰写。随后执行 \texttt{coverage} 并分析：我负责范围内覆盖率达到 100\%。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.82\textwidth]{白盒测试2对话截图/任务4-覆盖率-1.png}
+  \caption{任务四：确认先做覆盖率统计与分析}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.82\textwidth]{白盒测试2对话截图/任务4-覆盖率-2-测试.png}
+  \caption{任务四：覆盖率统计结果与分析}
+\end{figure}
+
+\subsubsection{任务五：测试报告与结果合并}
+
+覆盖率分析完成后，我要求模型按统一模板撰写《测试报告-白盒测试-练习与社区模块》，并进一步把新增内容合并回测试计划与测试报告，保证结构一致、口径一致。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.82\textwidth]{白盒测试2对话截图/任务5-测试报告-1.png}
+  \caption{任务五：按统一模板生成测试报告}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.82\textwidth]{白盒测试2对话截图/任务5-测试报告-3-合并.png}
+  \caption{任务五：将新增内容合并回测试计划与测试报告并统一格式}
+\end{figure}
+
+\subsubsection{任务六：未来扩展适配}
+
+由于有 \texttt{failed}，我要求模型补写未来扩展适配。模型围绕练习与社区模块提出 3 项未来变更，并分别给出黑盒/白盒测试调整思路及风险说明。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.82\textwidth]{白盒测试2对话截图/任务6-测试报告-2-未来扩展适配.png}
+  \caption{任务六：未来扩展适配与测试调整方案}
 \end{figure}
 
 \end{document}
